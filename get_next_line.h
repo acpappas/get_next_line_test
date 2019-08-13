@@ -15,12 +15,12 @@
 # define BUFF_SIZE 32
 # include "./libft/libft.h"
 
-typedef struct		s_struct
+typedef struct		s_listg
 {
 	char			*content;
 	int				fd;
-	struct s_struct	*next;
-}					g_list;
+	struct s_listg	*next;
+}					t_listg;
 
 int					get_next_line(const int fd, char **line);
 
