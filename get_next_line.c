@@ -18,7 +18,7 @@ static char		*getfile(t_listg **stat, int fd)
 	t_listg	*new;
 
 	if (!*stat)
-		*stat = NULL;
+	*stat = NULL;
 	find = *stat;
 	while (find)
 	{
@@ -46,11 +46,16 @@ static char		*get_line(char **temp, t_listg **stat, int fd)
 	if ((ptr = ft_strchr(*temp, '\n')))
 	{
 		*ptr = '\0';
+		line = ft_strcpy(line, *temp);
 		(*stat)->content = ft_strcpy((*stat)->content, (ptr + 1));
+		*stat = find;
+		ft_strclr(*temp);
+		return (line);	
 	}
 	*stat = find;
 	line = ft_strcpy(line, *temp);
 	ft_strclr(*temp);
+	ft_strclr((*stat)->content);
 	return (line);
 }
 
@@ -71,7 +76,6 @@ static void		to_free(t_listg **stat, int fd)
 	temp = find->next;
 	find->next = find->next->next;
 	free(&(temp)->content);
-	/*free(&(temp)->fd);*/
 	free(temp);
 }
 
@@ -94,18 +98,15 @@ int				get_next_line(const int fd, char **line)
 			return (-1);
 		if (ft_strchr(buf, '\n'))
 			break ;
-		ft_strclr(buf);
 	}
 	if (readret < 0)
 	{
 		to_free(&stat, fd);
 		return (-1);
 	}
-	if (readret > 0 || ft_strlen(temp) > 0)
-	{
-		*line = get_line(&temp, &stat, fd);
+	if (readret < BUFF_SIZE && !ft_strlen(temp))
+		return (0);
+
+	*line = get_line(&temp, &stat, fd);
 		return (1);
-	}
-	
-	return (0);
 }
