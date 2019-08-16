@@ -12,13 +12,31 @@
 
 #include "get_next_line.h"
 
+static void		to_free(t_listg **stat, int fd)
+{
+	t_listg	*find;
+	t_listg	*temp;
+
+	find = *stat;
+	if (*stat == NULL)
+		return ;
+	while (find->next->fd != fd)
+	{
+		if (find->next == NULL)
+			return ;
+		find = find->next;
+	}
+	temp = find->next;
+	find->next = find->next->next;
+	free(temp->content);
+	temp = NULL;
+}
+
 static char		*getfile(t_listg **stat, int fd)
 {
 	t_listg *find;
 	t_listg	*new;
 
-	if (!*stat)
-	*stat = NULL;
 	find = *stat;
 	while (find)
 	{
@@ -26,6 +44,8 @@ static char		*getfile(t_listg **stat, int fd)
 			return (find->content);
 		find = find->next;
 	}
+	if (!*stat)
+		*stat = NULL;
 	new = (t_listg *)ft_memalloc(sizeof(t_listg));
 	new->content = ft_strnew(0);
 	new->fd = fd;
@@ -59,26 +79,6 @@ static char		*get_line(char **temp, t_listg **stat, int fd)
 	return (line);
 }
 
-static void		to_free(t_listg **stat, int fd)
-{
-	t_listg	*find;
-	t_listg	*temp;
-
-	find = *stat;
-	if (*stat == NULL)
-		return ;
-	while (find->next->fd != fd)
-	{
-		if (find->next == NULL)
-			return ;
-		find = find->next;
-	}
-	temp = find->next;
-	find->next = find->next->next;
-	free(&(temp)->content);
-	free(temp);
-}
-
 int				get_next_line(const int fd, char **line)
 {
 	static t_listg	*stat;
@@ -89,12 +89,12 @@ int				get_next_line(const int fd, char **line)
 	if (fd < 0 || read(fd, buf, 0) < 0 || BUFF_SIZE <= 0)
 		return (-1);
 	*line = NULL;
-	if (!(temp = getfile(&stat, fd)))
+	if (!(temp = ft_strdup(getfile(&stat, fd))))
 		return (-1);
 	while ((readret = read(fd, buf, BUFF_SIZE)) > 0)
 	{
 		buf[readret] = '\0';
-		if (! (temp = ft_strjoin(temp, buf)))
+		if (!(temp = ft_strjoin(temp, buf)))
 			return (-1);
 		if (ft_strchr(buf, '\n'))
 			break ;
@@ -105,8 +105,10 @@ int				get_next_line(const int fd, char **line)
 		return (-1);
 	}
 	if (readret < BUFF_SIZE && !ft_strlen(temp))
+	{
+		ft_strclr(temp);
 		return (0);
-
+	}
 	*line = get_line(&temp, &stat, fd);
-		return (1);
+	return (1);
 }
