@@ -5,17 +5,18 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "clang compile 1",
+			"name": "(lldb) Launch",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/${fileBasenameNoExtension}",
-			"args": [],
+			"program": "${workspaceFolder}/a.out",
+			"args": ["Cirice.txt.rtf",
+					"Monstrance_clock.txt"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",
 			"environment": [],
-			"externalConsole": true,
+			"externalConsole": false,
 			"MIMode": "lldb",
-			"preLaunchTask": "clang compile 1"
+			"preLaunchTask": "gcc compile"
 		}
 	]
 }
